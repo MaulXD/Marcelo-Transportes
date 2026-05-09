@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-navy: #152b4d;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-marquee {
+    animation: none !important;
+  }
+}
+
+.glass-panel {
+  @apply rounded-2xl border border-slate-200/60 bg-white/80 shadow-lg backdrop-blur-lg dark:border-white/15 dark:bg-white/10 dark:shadow-2xl dark:backdrop-blur-lg;
+}
+
+.input-ring {
+  @apply rounded-xl border border-slate-200 bg-white px-4 py-3 text-[#152B4D] outline-none transition-shadow placeholder:text-slate-500 focus:border-brand-navy/45 focus:ring-2 focus:ring-brand-navy/25 dark:border-white/20 dark:bg-[#152B4D] dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/40 dark:focus:ring-white/25;
+}
+
+@layer components {
+  .cta-solid {
+    @apply bg-brand-navy font-semibold text-white shadow-brand-soft transition hover:brightness-110;
+    @apply dark:bg-[#25D366] dark:text-white dark:shadow-none dark:hover:brightness-110;
+  }
+}
