@@ -304,7 +304,7 @@ ${origemAcesso}
 *Destino*
 ${destinoAcesso}
 *Endereço:* ${destinoEnd}
-${observacao ? `\n*Observações:* ${observacao}` : ""}
+${observacao ? `\n*Observação:* ${observacao}` : ""}
 
 Gostaria de receber um orçamento. Obrigado!`;
 }
