@@ -12,6 +12,12 @@ export const accessSelectionSchema = z.union([
   accessEnum,
 ]);
 
+export const elevatorSelectionSchema = z.union([
+  z.literal(""),
+  z.enum(["sim", "nao"]),
+]);
+export type ElevatorSelection = z.infer<typeof elevatorSelectionSchema>;
+
 export const tamanhoEnum = z.enum([
   "pequena",
   "residencia_completa",
@@ -34,7 +40,8 @@ const addressSide = {
   numeroOrigemSemNumero: z.boolean(),
   complementoOrigem: z.string().optional(),
   acessoOrigem: accessSelectionSchema,
-  elevadorServicoOrigem: z.boolean(),
+  numeroApartamentoOrigem: z.string().optional(),
+  elevadorServicoOrigem: elevatorSelectionSchema,
   cepDestino: cepField,
   logradouroDestino: z.string().min(2, "Informe o logradouro"),
   bairroDestino: z.string().min(2, "Informe o bairro"),
@@ -44,7 +51,8 @@ const addressSide = {
   numeroDestinoSemNumero: z.boolean(),
   complementoDestino: z.string().optional(),
   acessoDestino: accessSelectionSchema,
-  elevadorServicoDestino: z.boolean(),
+  numeroApartamentoDestino: z.string().optional(),
+  elevadorServicoDestino: elevatorSelectionSchema,
 };
 
 export const step1Schema = z.object(addressSide).superRefine((data, ctx) => {
@@ -74,6 +82,20 @@ export const step1Schema = z.object(addressSide).superRefine((data, ctx) => {
       code: z.ZodIssueCode.custom,
       message: "Informe o número",
       path: ["numeroDestino"],
+    });
+  }
+  if (data.acessoOrigem === "ap" && data.elevadorServicoOrigem === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Selecione se possui elevador de serviço",
+      path: ["elevadorServicoOrigem"],
+    });
+  }
+  if (data.acessoDestino === "ap" && data.elevadorServicoDestino === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Selecione se possui elevador de serviço",
+      path: ["elevadorServicoDestino"],
     });
   }
 });
@@ -124,6 +146,20 @@ export const formSchema = z
         code: z.ZodIssueCode.custom,
         message: "Informe o número",
         path: ["numeroDestino"],
+      });
+    }
+    if (data.acessoOrigem === "ap" && data.elevadorServicoOrigem === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Selecione se possui elevador de serviço",
+        path: ["elevadorServicoOrigem"],
+      });
+    }
+    if (data.acessoDestino === "ap" && data.elevadorServicoDestino === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Selecione se possui elevador de serviço",
+        path: ["elevadorServicoDestino"],
       });
     }
     if (data.tipoCliente === "pf") {
@@ -187,8 +223,8 @@ export function formatAcessoDetalhado(
   elevadorServico: boolean
 ): string {
   if (access === "casa") return accessLabelForMessage(access);
-  const elevEmoji = elevadorServico ? "✅" : "❌";
-  return `${accessLabelForMessage(access)} (Elevador: ${elevEmoji})`;
+  const elevText = elevadorServico ? "Sim" : "Não";
+  return `${accessLabelForMessage(access)} (Elevador: ${elevText})`;
 }
 
 export function tamanhoHuman(value: TamanhoMudanca): string {
@@ -202,10 +238,6 @@ export function tamanhoHuman(value: TamanhoMudanca): string {
     default:
       return value;
   }
-}
-
-function emojiImovel(access: AccessType): string {
-  return access === "casa" ? "🏠" : "🏢";
 }
 
 export function buildWhatsAppMessage(values: QuoteFormValues): string {
@@ -243,11 +275,11 @@ export function buildWhatsAppMessage(values: QuoteFormValues): string {
 
   const origemAcesso = formatAcessoDetalhado(
     oA,
-    values.elevadorServicoOrigem
+    values.elevadorServicoOrigem === "sim"
   );
   const destinoAcesso = formatAcessoDetalhado(
     dA,
-    values.elevadorServicoDestino
+    values.elevadorServicoDestino === "sim"
   );
 
   const pjExtra =
@@ -266,11 +298,11 @@ ${pjExtra}*Porte da mudança:* ${tamanhoHuman(values.tamanhoMudanca)}
 *Meu WhatsApp:* ${values.whatsapp.trim()}
 
 *Origem*
-${emojiImovel(oA)} ${origemAcesso}
+${origemAcesso}
 *Endereço:* ${origemEnd}
 
 *Destino*
-${emojiImovel(dA)} ${destinoAcesso}
+${destinoAcesso}
 *Endereço:* ${destinoEnd}
 ${observacao ? `\n*Observações:* ${observacao}` : ""}
 

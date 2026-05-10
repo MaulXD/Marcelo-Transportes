@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Building2, Calendar, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Calendar, CircleDot, MapPin, User } from "lucide-react";
 import { useRef, useState } from "react";
 import {
   Controller,
@@ -97,7 +97,7 @@ export function MultiStepForm() {
       complementoOrigem: "",
       acessoOrigem: "",
       numeroApartamentoOrigem: "",
-      elevadorServicoOrigem: false,
+      elevadorServicoOrigem: "",
       cepDestino: "",
       logradouroDestino: "",
       bairroDestino: "",
@@ -108,7 +108,7 @@ export function MultiStepForm() {
       complementoDestino: "",
       acessoDestino: "",
       numeroApartamentoDestino: "",
-      elevadorServicoDestino: false,
+      elevadorServicoDestino: "",
       tamanhoMudanca: "pequena",
       observacao: "",
       tipoCliente: "pf",
@@ -340,10 +340,11 @@ export function MultiStepForm() {
                       </div>
                       <div>
                         <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
-                          Observação (opcional)
+                          Liste o que será, ou se tem alguma observação específica, utilize este campo.
                         </label>
                         <textarea
                           className="input-ring mt-1 w-full min-h-[120px] resize-none"
+                          placeholder="Liste o que será, ou se tem alguma observação específica, utilize este campo."
                           {...register("observacao")}
                         />
                       </div>
@@ -630,14 +631,32 @@ function AddressBlock({
     title === "Origem"
       ? "Tipo de acesso na Origem"
       : "Tipo de acesso no Destino";
+  
+  const isOrigem = title === "Origem";
+  const accentColor = isOrigem ? "sky-500" : "emerald-500";
+  const accentColorDark = isOrigem ? "sky-400" : "emerald-400";
+  const borderLeftColor = isOrigem ? "border-l-sky-500" : "border-l-emerald-500";
+  const iconColor = isOrigem ? "text-sky-500 dark:text-sky-400" : "text-emerald-500 dark:text-emerald-400";
+  const IconComponent = isOrigem ? CircleDot : MapPin;
+  const subtitleText = isOrigem ? "Local de coleta" : "Local de entrega";
 
   return (
-    <fieldset className="space-y-4 border-t border-slate-200/80 pt-8 first:border-t-0 first:pt-0 dark:border-white/15">
-      <legend className="text-sm font-semibold text-slate-900 dark:text-white">
-        {title}
-      </legend>
+    <fieldset className={`space-y-6 border-l-4 ${borderLeftColor} bg-slate-50/50 p-6 dark:bg-white/5 rounded-lg backdrop-blur-sm`}>
+      <div className="flex items-center gap-4">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-white/20 to-white/10 shadow-lg shadow-${accentColor}/20 dark:from-white/10 dark:to-white/5 ${iconColor}`}>
+          <IconComponent className="h-5 w-5" />
+        </div>
+        <div>
+          <legend className="text-xl font-black text-slate-900 dark:text-white">
+            {title}
+          </legend>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            {subtitleText}
+          </p>
+        </div>
+      </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <p className="text-sm font-medium text-slate-900 dark:text-white">
           {accessQuestion}
         </p>
@@ -661,7 +680,17 @@ function AddressBlock({
             className="space-y-4"
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-1">
+              {isAp ? (
+                <div className="sm:col-span-1">
+                  <ElevadorServico
+                    control={control}
+                    name={keys.elevador}
+                    error={fieldErr(keys.elevador)}
+                  />
+                </div>
+              ) : null}
+
+              <div className={isAp ? "sm:col-span-1" : "sm:col-span-2"}>
                 <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
                   CEP
                 </label>
@@ -749,16 +778,28 @@ function AddressBlock({
                   </p>
                 ) : null}
               </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <label className="text-base font-bold text-slate-900 md:text-lg dark:text-white">
+              <div className="sm:col-span-1 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
                     Número
                   </label>
+                  <input
+                    className={`input-ring mt-1 w-full ${noNumber ? "cursor-not-allowed bg-slate-100 text-slate-500 border-slate-200/70 ring-slate-200/70 shadow-none dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700" : ""}`}
+                    disabled={noNumber}
+                    {...register(keys.numero)}
+                  />
+                  {fieldErr(keys.numero) ? (
+                    <p className="mt-1 text-sm text-red-600 dark:text-orange-400">
+                      {fieldErr(keys.numero)}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex items-end">
                   <Controller
                     name={keys.semNumero}
                     control={control}
                     render={({ field }) => (
-                      <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300">
+                      <label className="flex items-center gap-2 rounded-2xl border border-slate-200/90 bg-white/60 px-4 py-3 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300">
                         <input
                           type="checkbox"
                           checked={field.value}
@@ -770,16 +811,6 @@ function AddressBlock({
                     )}
                   />
                 </div>
-                <input
-                  className={`input-ring mt-1 w-full ${noNumber ? "cursor-not-allowed bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400" : ""}`}
-                  disabled={noNumber}
-                  {...register(keys.numero)}
-                />
-                {fieldErr(keys.numero) ? (
-                  <p className="mt-1 text-sm text-red-600 dark:text-orange-400">
-                    {fieldErr(keys.numero)}
-                  </p>
-                ) : null}
               </div>
               <div>
                 <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
@@ -792,10 +823,6 @@ function AddressBlock({
                 />
               </div>
             </div>
-
-            {isAp ? (
-              <ElevadorServico control={control} name={keys.elevador} />
-            ) : null}
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -816,11 +843,11 @@ function AccessRadios({
   ] as const;
 
   return (
-    <div className="mt-2 flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-2">
       {opts.map((o) => (
         <label
           key={o.value}
-          className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200/90 bg-white/70 px-3 py-2 text-base font-bold text-slate-900 has-[:checked]:border-[#1a2b4b]/45 has-[:checked]:bg-[#1a2b4b]/10 has-[:checked]:text-[#1a2b4b] md:text-lg dark:border-white/15 dark:bg-white/10 dark:text-[#f8fafc] dark:has-[:checked]:border-sky-400/45 dark:has-[:checked]:bg-sky-500/15 dark:has-[:checked]:text-[#f8fafc]"
+          className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200/80 bg-white/50 px-3 py-1.5 text-sm font-medium text-slate-600 transition has-[:checked]:border-sky-400/60 has-[:checked]:bg-sky-500/15 has-[:checked]:text-slate-900 dark:border-white/15 dark:bg-white/5 dark:text-slate-300 dark:has-[:checked]:border-sky-400/50 dark:has-[:checked]:bg-sky-500/20 dark:has-[:checked]:text-white"
         >
           <input
             type="radio"
@@ -838,9 +865,11 @@ function AccessRadios({
 function ElevadorServico({
   control,
   name,
+  error,
 }: {
   control: Control<QuoteFormValues>;
   name: "elevadorServicoOrigem" | "elevadorServicoDestino";
+  error?: string;
 }) {
   return (
     <div className="rounded-xl border border-slate-200/90 bg-white/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
@@ -848,15 +877,25 @@ function ElevadorServico({
         name={name}
         control={control}
         render={({ field }) => (
-          <label className="flex cursor-pointer items-start gap-3 text-base font-bold text-slate-900 md:text-lg dark:text-white">
-            <input
-              type="checkbox"
-              checked={field.value}
-              onChange={(e) => field.onChange(e.target.checked)}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-[#1a2b4b] focus:ring-sky-400/40 dark:border-white/25 dark:bg-[#1e293b] dark:text-sky-400"
-            />
-            <span className="leading-snug">Possui elevador de serviço?</span>
-          </label>
+          <div className="space-y-2">
+            <label className="block text-base font-bold text-slate-900 md:text-lg dark:text-white">
+              Possui elevador de serviço?
+            </label>
+            <select
+              className="input-ring mt-1 w-full"
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+            >
+              <option value="">Selecione</option>
+              <option value="sim">Sim</option>
+              <option value="nao">Não</option>
+            </select>
+            {error ? (
+              <p className="mt-1 text-sm text-red-600 dark:text-orange-400">
+                {error}
+              </p>
+            ) : null}
+          </div>
         )}
       />
     </div>
