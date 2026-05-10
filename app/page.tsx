@@ -3,9 +3,10 @@ import { Footer } from "@/components/Footer";
 import { Gallery } from "@/components/Gallery";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { HeroDestaques } from "@/components/HeroDestaques";
 import { MultiStepForm } from "@/components/MultiStepForm";
-import { SectionFade } from "@/components/SectionFade";
 import { Services } from "@/components/Services";
+import { WhatsAppFAB } from "@/components/WhatsAppFAB";
 
 export default function Home() {
   return (
@@ -13,14 +14,14 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <HeroDestaques />
         <About />
         <Services />
-        <SectionFade>
-          <Gallery />
-        </SectionFade>
+        <Gallery />
         <MultiStepForm />
       </main>
       <Footer />
+      <WhatsAppFAB />
     </>
   );
 }

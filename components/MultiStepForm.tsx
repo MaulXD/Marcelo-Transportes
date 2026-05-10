@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Building2, Calendar, User } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Controller,
   type Control,
@@ -23,6 +23,7 @@ import {
   step2Schema,
   type QuoteFormValues,
 } from "@/lib/form-schema";
+import { WHATSAPP_PRIMARY_DIGITS } from "@/lib/whatsapp";
 import { maskCep, maskCnpj, maskWhatsappBr, onlyDigits } from "@/lib/masks";
 import { consultarCep } from "@/lib/viacep";
 import { andarDoApartamento } from "@/lib/apartamento";
@@ -36,6 +37,7 @@ const KEYS_ORIGEM = {
   cidade: "cidadeOrigem",
   uf: "ufOrigem",
   numero: "numeroOrigem",
+  semNumero: "numeroOrigemSemNumero",
   complemento: "complementoOrigem",
   acesso: "acessoOrigem",
   apto: "numeroApartamentoOrigem",
@@ -49,6 +51,7 @@ const KEYS_DESTINO = {
   cidade: "cidadeDestino",
   uf: "ufDestino",
   numero: "numeroDestino",
+  semNumero: "numeroDestinoSemNumero",
   complemento: "complementoDestino",
   acesso: "acessoDestino",
   apto: "numeroApartamentoDestino",
@@ -90,6 +93,7 @@ export function MultiStepForm() {
       cidadeOrigem: "",
       ufOrigem: "",
       numeroOrigem: "",
+      numeroOrigemSemNumero: false,
       complementoOrigem: "",
       acessoOrigem: "",
       numeroApartamentoOrigem: "",
@@ -100,11 +104,13 @@ export function MultiStepForm() {
       cidadeDestino: "",
       ufDestino: "",
       numeroDestino: "",
+      numeroDestinoSemNumero: false,
       complementoDestino: "",
       acessoDestino: "",
       numeroApartamentoDestino: "",
       elevadorServicoDestino: false,
       tamanhoMudanca: "pequena",
+      observacao: "",
       tipoCliente: "pf",
       nomeCompleto: "",
       nomeEmpresa: "",
@@ -148,9 +154,25 @@ export function MultiStepForm() {
     setStep((s) => Math.max(0, s - 1));
   }
 
+  function getStepForError(key: string) {
+    if (/^(cep|logradouro|bairro|cidade|uf|numero|complemento|acesso|numeroApartamento|elevadorServico)/.test(key)) {
+      return 0;
+    }
+    if (key === "tamanhoMudanca") {
+      return 1;
+    }
+    return 2;
+  }
+
+  function handleInvalid(invalidErrors: FieldErrors<QuoteFormValues>) {
+    const keys = Object.keys(invalidErrors);
+    if (keys.length === 0) return;
+    setStep(getStepForError(keys[0]));
+  }
+
   const onValid = (values: QuoteFormValues) => {
     const phone = (
-      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5582988696838"
+      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? WHATSAPP_PRIMARY_DIGITS
     ).replace(/\D/g, "");
     if (phone.length < 10) {
       alert(
@@ -171,16 +193,16 @@ export function MultiStepForm() {
       aria-labelledby="orcamento-heading"
     >
       <div className="mx-auto max-w-3xl">
-        <p className="text-center text-sm font-semibold uppercase tracking-wider text-brand-navy/90 dark:text-white/75">
+        <p className="text-center text-sm font-semibold uppercase tracking-wider text-[#1a2b4b]/90 dark:text-[#f8fafc]/75">
           Orçamento sem complicação
         </p>
         <h2
           id="orcamento-heading"
-          className="mt-2 text-center text-3xl font-bold tracking-tight text-brand-navy sm:text-4xl dark:text-white"
+          className="mt-2 text-center text-3xl font-bold tracking-tight text-[#1a2b4b] sm:text-4xl dark:text-[#f8fafc]"
         >
           Monte seu pedido em três passos
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-center text-slate-700 dark:text-white/85">
+        <p className="mx-auto mt-4 max-w-xl text-center text-[#1a2b4b]/90 dark:text-[#f8fafc]/85">
           Preencha os dados abaixo para receber um orçamento rápido e preciso
           diretamente no seu WhatsApp.
         </p>
@@ -189,14 +211,19 @@ export function MultiStepForm() {
           <div className="mb-8 flex justify-center gap-2 sm:gap-4">
             {STEPS.map((label, i) => (
               <div key={label} className="flex items-center gap-2 sm:gap-4">
-                <div className="flex flex-col items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setStep(i)}
+                  aria-current={i === step ? "step" : undefined}
+                  className="flex flex-col items-center gap-1 text-left focus:outline-none focus:ring-2 focus:ring-sky-500"
+                >
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
                       i === step
-                        ? "bg-brand-navy text-white shadow-brand-soft dark:shadow-brand-soft-dark"
+                        ? "bg-[#1a2b4b] text-white shadow-brand-soft dark:bg-sky-500 dark:text-[#0f172a] dark:shadow-brand-soft-dark"
                         : i < step
-                          ? "bg-brand-navy/15 text-brand-navy ring-1 ring-brand-navy/30 dark:bg-brand-navy/25 dark:text-slate-100 dark:ring-brand-navy/45"
-                          : "bg-slate-100 text-slate-500 ring-1 ring-slate-200 dark:bg-white/5 dark:text-slate-500 dark:ring-white/10"
+                          ? "bg-[#1a2b4b]/15 text-[#1a2b4b] ring-1 ring-[#1a2b4b]/30 dark:bg-sky-500/20 dark:text-[#f8fafc] dark:ring-sky-400/45"
+                          : "bg-slate-100 text-slate-500 ring-1 ring-slate-200 dark:bg-white/5 dark:text-slate-400 dark:ring-white/10"
                     }`}
                   >
                     {i + 1}
@@ -204,25 +231,25 @@ export function MultiStepForm() {
                   <span className="hidden text-xs text-slate-500 sm:block dark:text-white/55">
                     {label}
                   </span>
-                </div>
+                </button>
                 {i < STEPS.length - 1 ? (
                   <div
-                    className={`hidden h-px w-10 sm:block ${i < step ? "bg-brand-navy/35 dark:bg-brand-navy/50" : "bg-slate-200 dark:bg-white/10"}`}
+                    className={`hidden h-px w-10 sm:block ${i < step ? "bg-[#1a2b4b]/35 dark:bg-sky-400/45" : "bg-slate-200 dark:bg-white/10"}`}
                   />
                 ) : null}
               </div>
             ))}
           </div>
 
-          <form onSubmit={handleSubmit(onValid)}>
+          <form onSubmit={handleSubmit(onValid, handleInvalid)}>
             <AnimatePresence mode="wait">
               {step === 0 ? (
                 <motion.div
                   key="step0"
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -24 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, x: 28, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -24, scale: 0.96 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                   className="space-y-10"
                 >
                   <AddressBlock
@@ -255,20 +282,21 @@ export function MultiStepForm() {
               {step === 1 ? (
                 <motion.div
                   key="step1"
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -24 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, x: 28, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -24, scale: 0.96 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                   className="space-y-4"
                 >
-                  <p className="text-sm text-slate-600 dark:text-white/75">
+                  <p className="text-sm text-[#1a2b4b]/85 dark:text-[#f8fafc]/75">
                     Escolha o porte da mudança.
                   </p>
                   <Controller
                     name="tamanhoMudanca"
                     control={control}
                     render={({ field }) => (
-                      <div className="grid gap-4 sm:grid-cols-3">
+                      <>
+                        <div className="grid gap-4 sm:grid-cols-3">
                         {(
                           [
                             {
@@ -283,31 +311,44 @@ export function MultiStepForm() {
                             },
                             {
                               value: "escritorio" as const,
-                              title: "Escritório / empresa",
+                              title: "Escritório ou empresa",
                               desc: "Mobiliário corporativo e operações B2B.",
                             },
                           ] as const
                         ).map((opt) => (
-                          <button
+                          <motion.button
                             key={opt.value}
                             type="button"
                             onClick={() => field.onChange(opt.value)}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 22 }}
                             className={`rounded-2xl border p-4 text-left transition ${
                               field.value === opt.value
-                                ? "border-brand-navy/45 bg-brand-navy/[0.06] shadow-brand-soft ring-2 ring-brand-navy/25 dark:bg-brand-navy/15 dark:shadow-brand-soft-dark dark:ring-brand-navy/45"
-                                : "border-slate-200/90 bg-white/60 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+                                ? "border-[#1a2b4b]/45 bg-[#1a2b4b]/[0.06] shadow-brand-soft ring-2 ring-[#1a2b4b]/25 dark:border-sky-400/40 dark:bg-sky-500/10 dark:shadow-brand-soft-dark dark:ring-sky-400/35"
+                                : "border-slate-200/90 bg-white/60 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-white/25"
                             }`}
                           >
-                            <p className="font-semibold text-slate-900 dark:text-slate-100">
+                            <p className="font-semibold text-[#1a2b4b] dark:text-[#f8fafc]">
                               {opt.title}
                             </p>
-                            <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-500">
+                            <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-[#f8fafc]/55">
                               {opt.desc}
                             </p>
-                          </button>
+                          </motion.button>
                         ))}
                       </div>
-                    )}
+                      <div>
+                        <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
+                          Observação (opcional)
+                        </label>
+                        <textarea
+                          className="input-ring mt-1 w-full min-h-[120px] resize-none"
+                          {...register("observacao")}
+                        />
+                      </div>
+                    </>
+                  )}
                   />
                   {errors.tamanhoMudanca ? (
                     <p className="text-sm text-red-600 dark:text-orange-400">
@@ -320,10 +361,10 @@ export function MultiStepForm() {
               {step === 2 ? (
                 <motion.div
                   key="step2"
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -24 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, x: 28, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -24, scale: 0.96 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                   className="space-y-6"
                 >
                   <Controller
@@ -331,42 +372,51 @@ export function MultiStepForm() {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <p className="text-sm font-medium text-[#1a2b4b] dark:text-[#f8fafc]/85">
                           Tipo de cliente
                         </p>
                         <div className="mt-3 grid grid-cols-2 gap-3">
-                          <button
+                          <motion.button
                             type="button"
                             onClick={() => field.onChange("pf")}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 22 }}
                             className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition ${
                               field.value === "pf"
-                                ? "border-brand-navy/45 bg-brand-navy/10 text-brand-navy ring-1 ring-brand-navy/25 dark:bg-brand-navy/25 dark:text-slate-50 dark:ring-brand-navy/45"
-                                : "border-slate-200/90 bg-white/60 text-slate-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-400"
+                                ? "border-[#1a2b4b]/45 bg-[#1a2b4b]/10 text-[#1a2b4b] ring-1 ring-[#1a2b4b]/25 dark:border-sky-400/45 dark:bg-sky-500/15 dark:text-[#f8fafc] dark:ring-sky-400/35"
+                                : "border-slate-200/90 bg-white/60 text-slate-500 dark:border-white/10 dark:bg-white/[0.05] dark:text-[#f8fafc]/55"
                             }`}
                           >
                             <User className="h-4 w-4" />
                             Pessoa física
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
                             type="button"
                             onClick={() => field.onChange("pj")}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 22 }}
                             className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition ${
                               field.value === "pj"
-                                ? "border-slate-600/45 bg-slate-600/10 text-slate-900 ring-1 ring-slate-600/25 dark:border-slate-400/40 dark:bg-slate-500/15 dark:text-slate-100 dark:ring-slate-400/35"
-                                : "border-slate-200/90 bg-white/60 text-slate-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-400"
+                                ? "border-[#1a2b4b]/45 bg-[#1a2b4b]/12 text-[#1a2b4b] ring-1 ring-[#1a2b4b]/25 dark:border-sky-400/45 dark:bg-sky-500/12 dark:text-[#f8fafc] dark:ring-sky-400/35"
+                                : "border-slate-200/90 bg-white/60 text-slate-500 dark:border-white/10 dark:bg-white/[0.05] dark:text-[#f8fafc]/55"
                             }`}
                           >
                             <Building2 className="h-4 w-4" />
                             Pessoa jurídica
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     )}
                   />
 
                   {tipo === "pf" ? (
-                    <div>
-                      <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                    >
+                      <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
                         Nome completo
                       </label>
                       <input
@@ -378,11 +428,14 @@ export function MultiStepForm() {
                           {errors.nomeCompleto.message}
                         </p>
                       ) : null}
-                    </div>
+                    </motion.div>
                   ) : (
                     <>
-                      <div>
-                        <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                      >
+                        <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
                           Nome da empresa
                         </label>
                         <input
@@ -394,9 +447,12 @@ export function MultiStepForm() {
                             {errors.nomeEmpresa.message}
                           </p>
                         ) : null}
-                      </div>
-                      <div>
-                        <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                      >
+                        <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
                           CNPJ
                         </label>
                         <Controller
@@ -420,13 +476,16 @@ export function MultiStepForm() {
                             {errors.cnpj.message}
                           </p>
                         ) : null}
-                      </div>
+                      </motion.div>
                     </>
                   )}
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                    >
+                      <label className="mb-2 block text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
                         WhatsApp
                       </label>
                       <Controller
@@ -451,10 +510,13 @@ export function MultiStepForm() {
                           {errors.whatsapp.message}
                         </p>
                       ) : null}
-                    </div>
-                    <div>
-                      <label className="mb-2 flex items-center gap-2 text-base font-bold text-slate-900 md:text-lg dark:text-white">
-                        <Calendar className="h-4 w-4 shrink-0 text-brand-navy dark:text-[#8A94A6]" />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                    >
+                      <label className="mb-2 flex items-center gap-2 text-base font-bold text-[#1a2b4b] md:text-lg dark:text-[#f8fafc]">
+                        <Calendar className="h-4 w-4 shrink-0 text-[#1a2b4b] dark:text-sky-400" />
                         Data da mudança
                       </label>
                       <input
@@ -467,10 +529,10 @@ export function MultiStepForm() {
                           {errors.dataMudanca.message}
                         </p>
                       ) : null}
-                    </div>
+                    </motion.div>
                   </div>
 
-                  <p className="rounded-xl border border-slate-200/90 bg-white/50 p-3 text-xs leading-relaxed text-slate-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
+                  <p className="rounded-xl border border-slate-200/90 bg-white/50 p-3 text-xs leading-relaxed text-slate-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#f8fafc]/75">
                     Ao enviar, você será direcionado ao WhatsApp com um resumo do
                     seu pedido para finalizar com nossa equipe.
                   </p>
@@ -540,11 +602,8 @@ function AddressBlock({
 }) {
   const access = watch(keys.acesso);
   const accessChosen = access !== "";
-  const isAp = access === "ap_escada" || access === "ap_elevador";
-  const isElev = access === "ap_elevador";
-  const aptoWatch = watch(keys.apto);
-  const andarPrev =
-    isAp && aptoWatch?.trim() ? andarDoApartamento(aptoWatch) : "";
+  const isAp = access === "ap";
+  const noNumber = watch(keys.semNumero);
 
   async function handleCepFilled() {
     const raw = getValues(keys.cep);
@@ -569,8 +628,8 @@ function AddressBlock({
 
   const accessQuestion =
     title === "Origem"
-      ? "Como é o acesso na Origem? (Casa, Ap escada, Ap elevador)"
-      : "Como é o acesso no Destino? (Casa, Ap escada, Ap elevador)";
+      ? "Tipo de acesso na Origem"
+      : "Tipo de acesso no Destino";
 
   return (
     <fieldset className="space-y-4 border-t border-slate-200/80 pt-8 first:border-t-0 first:pt-0 dark:border-white/15">
@@ -594,10 +653,10 @@ function AddressBlock({
         {accessChosen ? (
           <motion.div
             key={`address-reveal-${keys.acesso}`}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.45 }}
+            initial={{ opacity: 0, height: 0, scale: 0.98 }}
+            animate={{ opacity: 1, height: "auto", scale: 1 }}
+            exit={{ opacity: 0, height: 0, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{ overflow: "hidden" }}
             className="space-y-4"
           >
@@ -691,10 +750,31 @@ function AddressBlock({
                 ) : null}
               </div>
               <div>
-                <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
-                  Número
-                </label>
-                <input className="input-ring mt-1 w-full" {...register(keys.numero)} />
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <label className="text-base font-bold text-slate-900 md:text-lg dark:text-white">
+                    Número
+                  </label>
+                  <Controller
+                    name={keys.semNumero}
+                    control={control}
+                    render={({ field }) => (
+                      <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300">
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4 rounded border-slate-300 text-[#1a2b4b] focus:ring-sky-400/40 dark:border-white/25 dark:bg-[#1e293b] dark:text-sky-400"
+                        />
+                        Sem número
+                      </label>
+                    )}
+                  />
+                </div>
+                <input
+                  className={`input-ring mt-1 w-full ${noNumber ? "cursor-not-allowed bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400" : ""}`}
+                  disabled={noNumber}
+                  {...register(keys.numero)}
+                />
                 {fieldErr(keys.numero) ? (
                   <p className="mt-1 text-sm text-red-600 dark:text-orange-400">
                     {fieldErr(keys.numero)}
@@ -714,25 +794,6 @@ function AddressBlock({
             </div>
 
             {isAp ? (
-              <div>
-                <label className="mb-2 block text-base font-bold text-slate-900 md:text-lg dark:text-white">
-                  Número do apartamento
-                </label>
-                <input className="input-ring mt-1 w-full" {...register(keys.apto)} />
-                {andarPrev ? (
-                  <p className="mt-1 text-xs text-slate-600 dark:text-white/65">
-                    Andar estimado: <strong>{andarPrev}</strong>
-                  </p>
-                ) : null}
-                {fieldErr(keys.apto) ? (
-                  <p className="mt-1 text-sm text-red-600 dark:text-orange-400">
-                    {fieldErr(keys.apto)}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-
-            {isElev ? (
               <ElevadorServico control={control} name={keys.elevador} />
             ) : null}
           </motion.div>
@@ -751,8 +812,7 @@ function AccessRadios({
 }) {
   const opts = [
     { value: "casa", label: "Casa" },
-    { value: "ap_escada", label: "Apartamento com escada" },
-    { value: "ap_elevador", label: "Apartamento com elevador" },
+    { value: "ap", label: "Apartamento" },
   ] as const;
 
   return (
@@ -760,7 +820,7 @@ function AccessRadios({
       {opts.map((o) => (
         <label
           key={o.value}
-          className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200/90 bg-white/70 px-3 py-2 text-base font-bold text-slate-900 has-[:checked]:border-brand-navy/45 has-[:checked]:bg-brand-navy/10 has-[:checked]:text-brand-navy md:text-lg dark:border-white/15 dark:bg-white/10 dark:text-white dark:has-[:checked]:border-white/35 dark:has-[:checked]:bg-white/15 dark:has-[:checked]:text-white"
+          className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200/90 bg-white/70 px-3 py-2 text-base font-bold text-slate-900 has-[:checked]:border-[#1a2b4b]/45 has-[:checked]:bg-[#1a2b4b]/10 has-[:checked]:text-[#1a2b4b] md:text-lg dark:border-white/15 dark:bg-white/10 dark:text-[#f8fafc] dark:has-[:checked]:border-sky-400/45 dark:has-[:checked]:bg-sky-500/15 dark:has-[:checked]:text-[#f8fafc]"
         >
           <input
             type="radio"
@@ -793,7 +853,7 @@ function ElevadorServico({
               type="checkbox"
               checked={field.value}
               onChange={(e) => field.onChange(e.target.checked)}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-navy focus:ring-brand-navy dark:border-white/25 dark:bg-slate-900 dark:text-brand-navy"
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-[#1a2b4b] focus:ring-sky-400/40 dark:border-white/25 dark:bg-[#1e293b] dark:text-sky-400"
             />
             <span className="leading-snug">Possui elevador de serviço?</span>
           </label>

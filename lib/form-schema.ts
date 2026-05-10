@@ -2,7 +2,7 @@ import { z } from "zod";
 import { andarDoApartamento } from "@/lib/apartamento";
 import { formatCepDisplay, onlyDigits } from "@/lib/masks";
 
-export const accessEnum = z.enum(["casa", "ap_escada", "ap_elevador"]);
+export const accessEnum = z.enum(["casa", "ap"]);
 export type AccessType = z.infer<typeof accessEnum>;
 /** Estado inicial do formulário antes da escolha do usuário (progressive disclosure). */
 export type AccessSelection = "" | AccessType;
@@ -30,20 +30,20 @@ const addressSide = {
   bairroOrigem: z.string().min(2, "Informe o bairro"),
   cidadeOrigem: z.string().min(2, "Informe a cidade"),
   ufOrigem: z.string().max(2),
-  numeroOrigem: z.string().min(1, "Informe o número"),
+  numeroOrigem: z.string(),
+  numeroOrigemSemNumero: z.boolean(),
   complementoOrigem: z.string().optional(),
   acessoOrigem: accessSelectionSchema,
-  numeroApartamentoOrigem: z.string().optional(),
   elevadorServicoOrigem: z.boolean(),
   cepDestino: cepField,
   logradouroDestino: z.string().min(2, "Informe o logradouro"),
   bairroDestino: z.string().min(2, "Informe o bairro"),
   cidadeDestino: z.string().min(2, "Informe a cidade"),
   ufDestino: z.string().max(2),
-  numeroDestino: z.string().min(1, "Informe o número"),
+  numeroDestino: z.string(),
+  numeroDestinoSemNumero: z.boolean(),
   complementoDestino: z.string().optional(),
   acessoDestino: accessSelectionSchema,
-  numeroApartamentoDestino: z.string().optional(),
   elevadorServicoDestino: z.boolean(),
 };
 
@@ -51,47 +51,43 @@ export const step1Schema = z.object(addressSide).superRefine((data, ctx) => {
   if (data.acessoOrigem === "") {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Selecione como é o acesso na origem",
+      message: "Selecione o tipo de acesso na origem",
       path: ["acessoOrigem"],
     });
   }
   if (data.acessoDestino === "") {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Selecione como é o acesso no destino",
+      message: "Selecione o tipo de acesso no destino",
       path: ["acessoDestino"],
     });
   }
-  if (data.acessoOrigem !== "" && data.acessoOrigem !== "casa") {
-    const apt = data.numeroApartamentoOrigem?.trim() ?? "";
-    if (!apt) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Informe o número do apartamento",
-        path: ["numeroApartamentoOrigem"],
-      });
-    }
+  if (!data.numeroOrigemSemNumero && data.numeroOrigem.trim().length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Informe o número",
+      path: ["numeroOrigem"],
+    });
   }
-  if (data.acessoDestino !== "" && data.acessoDestino !== "casa") {
-    const apt = data.numeroApartamentoDestino?.trim() ?? "";
-    if (!apt) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Informe o número do apartamento",
-        path: ["numeroApartamentoDestino"],
-      });
-    }
+  if (!data.numeroDestinoSemNumero && data.numeroDestino.trim().length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Informe o número",
+      path: ["numeroDestino"],
+    });
   }
 });
 
 export const step2Schema = z.object({
   tamanhoMudanca: tamanhoEnum,
+  observacao: z.string().optional(),
 });
 
 export const formSchema = z
   .object({
     ...addressSide,
     tamanhoMudanca: tamanhoEnum,
+    observacao: z.string().optional(),
     tipoCliente: z.enum(["pf", "pj"]),
     nomeCompleto: z.string().optional(),
     nomeEmpresa: z.string().optional(),
@@ -105,36 +101,30 @@ export const formSchema = z
     if (data.acessoOrigem === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Selecione como é o acesso na origem",
+        message: "Selecione o tipo de acesso na origem",
         path: ["acessoOrigem"],
       });
     }
     if (data.acessoDestino === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Selecione como é o acesso no destino",
+        message: "Selecione o tipo de acesso no destino",
         path: ["acessoDestino"],
       });
     }
-    if (data.acessoOrigem !== "" && data.acessoOrigem !== "casa") {
-      const apt = data.numeroApartamentoOrigem?.trim() ?? "";
-      if (!apt) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Informe o número do apartamento",
-          path: ["numeroApartamentoOrigem"],
-        });
-      }
+    if (!data.numeroOrigemSemNumero && data.numeroOrigem.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe o número",
+        path: ["numeroOrigem"],
+      });
     }
-    if (data.acessoDestino !== "" && data.acessoDestino !== "casa") {
-      const apt = data.numeroApartamentoDestino?.trim() ?? "";
-      if (!apt) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Informe o número do apartamento",
-          path: ["numeroApartamentoDestino"],
-        });
-      }
+    if (!data.numeroDestinoSemNumero && data.numeroDestino.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe o número",
+        path: ["numeroDestino"],
+      });
     }
     if (data.tipoCliente === "pf") {
       if (!data.nomeCompleto?.trim() || data.nomeCompleto.trim().length < 3) {
@@ -170,10 +160,8 @@ export function accessLabelForMessage(access: AccessType): string {
   switch (access) {
     case "casa":
       return "Casa";
-    case "ap_escada":
-      return "Apartamento com escada";
-    case "ap_elevador":
-      return "Apartamento com elevador";
+    case "ap":
+      return "Apartamento";
     default:
       return access;
   }
@@ -191,32 +179,33 @@ export function formatEnderecoCompleto(
   const comp = complemento?.trim();
   const ufTxt = uf?.trim();
   const tail = ufTxt ? `${cidade}/${ufTxt}` : cidade;
-  return `${logradouro.trim()}, ${numero.trim()}${comp ? `, ${comp}` : ""} — ${bairro.trim()}, ${tail}. CEP ${formatCepDisplay(cep)}`;
+  return `${logradouro.trim()}, ${numero.trim()}${comp ? `, ${comp}` : ""}. ${bairro.trim()}, ${tail}. CEP ${formatCepDisplay(cep)}`;
 }
 
 export function formatAcessoDetalhado(
   access: AccessType,
-  numeroApartamento: string,
   elevadorServico: boolean
 ): string {
   if (access === "casa") return accessLabelForMessage(access);
-  const andar = andarDoApartamento(numeroApartamento);
-  const base = `${accessLabelForMessage(access)} (${andar}`;
-  if (access === "ap_escada") return `${base})`;
-  return `${base} — Elevador de serviço: ${elevadorServico ? "Sim" : "Não"})`;
+  const elevEmoji = elevadorServico ? "✅" : "❌";
+  return `${accessLabelForMessage(access)} (Elevador: ${elevEmoji})`;
 }
 
 export function tamanhoHuman(value: TamanhoMudanca): string {
   switch (value) {
     case "pequena":
-      return "pequena (móveis soltos)";
+      return "pequena, móveis soltos";
     case "residencia_completa":
       return "residência completa";
     case "escritorio":
-      return "escritório/empresa";
+      return "escritório ou empresa";
     default:
       return value;
   }
+}
+
+function emojiImovel(access: AccessType): string {
+  return access === "casa" ? "🏠" : "🏢";
 }
 
 export function buildWhatsAppMessage(values: QuoteFormValues): string {
@@ -225,9 +214,15 @@ export function buildWhatsAppMessage(values: QuoteFormValues): string {
       ? values.nomeCompleto!.trim()
       : values.nomeEmpresa!.trim();
 
+  const oA = values.acessoOrigem as AccessType;
+  const dA = values.acessoDestino as AccessType;
+
+  const origemNumero = values.numeroOrigemSemNumero ? "S/N" : values.numeroOrigem;
+  const destinoNumero = values.numeroDestinoSemNumero ? "S/N" : values.numeroDestino;
+
   const origemEnd = formatEnderecoCompleto(
     values.logradouroOrigem,
-    values.numeroOrigem,
+    origemNumero,
     values.complementoOrigem,
     values.bairroOrigem,
     values.cidadeOrigem,
@@ -236,7 +231,7 @@ export function buildWhatsAppMessage(values: QuoteFormValues): string {
   );
   const destinoEnd = formatEnderecoCompleto(
     values.logradouroDestino,
-    values.numeroDestino,
+    destinoNumero,
     values.complementoDestino,
     values.bairroDestino,
     values.cidadeDestino,
@@ -244,21 +239,40 @@ export function buildWhatsAppMessage(values: QuoteFormValues): string {
     values.cepDestino
   );
 
+  const observacao = values.observacao?.trim();
+
   const origemAcesso = formatAcessoDetalhado(
-    values.acessoOrigem as AccessType,
-    values.numeroApartamentoOrigem ?? "",
+    oA,
     values.elevadorServicoOrigem
   );
   const destinoAcesso = formatAcessoDetalhado(
-    values.acessoDestino as AccessType,
-    values.numeroApartamentoDestino ?? "",
+    dA,
     values.elevadorServicoDestino
   );
 
-  return `Olá! Meu nome é ${nomeOuEmpresa}. Preciso de uma mudança ${tamanhoHuman(values.tamanhoMudanca)} para o dia ${values.dataMudanca}.
+  const pjExtra =
+    values.tipoCliente === "pj" && values.cnpj?.trim()
+      ? `*CNPJ:* ${values.cnpj.trim()}\n`
+      : "";
 
-📍 ORIGEM: ${origemEnd} — Acesso: ${origemAcesso}.
-📍 DESTINO: ${destinoEnd} — Acesso: ${destinoAcesso}.
+  return `Olá!
 
-Pode me passar um orçamento?`;
+*Orçamento Marcelo Luz Transportes*
+
+*Nome / empresa:* ${nomeOuEmpresa}
+*Tipo de cliente:* ${values.tipoCliente === "pf" ? "Pessoa física" : "Pessoa jurídica"}
+${pjExtra}*Porte da mudança:* ${tamanhoHuman(values.tamanhoMudanca)}
+*Data da mudança:* ${values.dataMudanca}
+*Meu WhatsApp:* ${values.whatsapp.trim()}
+
+*Origem*
+${emojiImovel(oA)} ${origemAcesso}
+*Endereço:* ${origemEnd}
+
+*Destino*
+${emojiImovel(dA)} ${destinoAcesso}
+*Endereço:* ${destinoEnd}
+${observacao ? `\n*Observações:* ${observacao}` : ""}
+
+Gostaria de receber um orçamento. Obrigado!`;
 }

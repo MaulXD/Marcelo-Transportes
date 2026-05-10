@@ -20,16 +20,16 @@ export function About() {
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-14">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-white/70">
+            <p className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-[#f8fafc]/70">
               Quem somos
             </p>
             <h2
               id="sobre-heading"
-              className="mt-2 text-3xl font-bold tracking-tight text-[#152B4D] dark:text-white sm:text-4xl"
+              className="mt-2 text-3xl font-bold tracking-tight text-[#1a2b4b] dark:text-[#f8fafc] sm:text-4xl"
             >
               Marcelo Luz Transportes
             </h2>
-            <p className="mt-6 leading-relaxed text-slate-700 dark:text-white/85">
+            <p className="mt-6 leading-relaxed text-slate-700 dark:text-[#f8fafc]/85">
               A Marcelo Transportes é uma empresa dedicada a oferecer soluções de
               transporte rodoviário eficientes e seguras. Fundada em 2022, nossa
               trajetória é marcada pelo compromisso em conectar cidades e
@@ -41,9 +41,9 @@ export function About() {
               investimos em uma logística otimizada para garantir que seus bens
               cheguem ao destino com total integridade e dentro do prazo.
             </p>
-            <p className="mt-4 text-sm text-slate-600 dark:text-white/65">
+            <p className="mt-4 text-sm text-slate-600 dark:text-[#f8fafc]/65">
               CNPJ{" "}
-              <span className="font-medium text-[#152B4D] dark:text-white">
+              <span className="font-medium text-[#1a2b4b] dark:text-[#f8fafc]">
                 44.971.020/0001-85
               </span>
               {" · "}
@@ -52,10 +52,10 @@ export function About() {
           </div>
 
           <aside className="glass-panel p-6 sm:p-8">
-            <h3 className="text-xl font-semibold text-[#152B4D] dark:text-white">
+            <h3 className="text-xl font-semibold text-[#1a2b4b] dark:text-[#f8fafc]">
               Nosso Objetivo
             </h3>
-            <p className="mt-4 leading-relaxed text-slate-700 dark:text-white/85">
+            <p className="mt-4 leading-relaxed text-slate-700 dark:text-[#f8fafc]/85">
               Ser a parceira ideal para suas necessidades de transporte,
               oferecendo um serviço que combine excelência, segurança e
               pontualidade. Buscamos expandir nossa atuação, solidificando nossa

@@ -3,11 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --brand-navy: #152b4d;
+  --brand-navy: #1a2b4b;
+  --surface-light: #c5d9ed;
+  --surface-dark: #0f172a;
+  --accent-sky: #38bdf8;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.shake {
+  animation: shake 0.35s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -17,16 +36,16 @@ html {
 }
 
 .glass-panel {
-  @apply rounded-2xl border border-slate-200/60 bg-white/80 shadow-lg backdrop-blur-lg dark:border-white/15 dark:bg-white/10 dark:shadow-2xl dark:backdrop-blur-lg;
+  @apply rounded-2xl border border-white/40 bg-white/75 shadow-lg backdrop-blur-lg dark:border-white/10 dark:bg-white/[0.08] dark:shadow-2xl dark:backdrop-blur-lg;
 }
 
 .input-ring {
-  @apply rounded-xl border border-slate-200 bg-white px-4 py-3 text-[#152B4D] outline-none transition-shadow placeholder:text-slate-500 focus:border-brand-navy/45 focus:ring-2 focus:ring-brand-navy/25 dark:border-white/20 dark:bg-[#152B4D] dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/40 dark:focus:ring-white/25;
+  @apply rounded-xl border border-slate-300/80 bg-white px-4 py-3 text-[#1a2b4b] outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-sky-500/60 focus:ring-2 focus:ring-sky-400/30 dark:border-white/15 dark:bg-[#1e293b] dark:text-[#f8fafc] dark:placeholder:text-slate-400 dark:focus:border-sky-400/50 dark:focus:ring-sky-400/25;
 }
 
 @layer components {
   .cta-solid {
-    @apply bg-brand-navy font-semibold text-white shadow-brand-soft transition hover:brightness-110;
-    @apply dark:bg-[#25D366] dark:text-white dark:shadow-none dark:hover:brightness-110;
+    @apply bg-[#1a2b4b] font-semibold text-white shadow-brand-soft transition hover:brightness-110;
+    @apply dark:bg-sky-500 dark:text-[#0f172a] dark:shadow-none dark:hover:brightness-105;
   }
 }

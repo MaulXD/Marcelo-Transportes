@@ -11,7 +11,14 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy: "#152B4D",
+          navy: "#1a2b4b",
+        },
+        design: {
+          light: "#c5d9ed",
+          dark: "#0f172a",
+          ink: "#1a2b4b",
+          snow: "#f8fafc",
+          accent: "#38bdf8",
         },
       },
       keyframes: {
@@ -21,7 +28,8 @@ const config: Config = {
         },
       },
       animation: {
-        "scroll-marquee": "scroll-marquee 40s linear infinite",
+        /* Mantido para eventual uso; galeria usa rolagem JS + loop. */
+        "scroll-marquee": "scroll-marquee 120s linear infinite",
       },
       boxShadow: {
         "brand-soft":

@@ -20,17 +20,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default:
-      "Marcelo Luz Transportes | Mudan?as de Macei? para todo o Nordeste",
+      "Marcelo Luz Transportes | Mudanças de Maceió para todo o Nordeste",
     template: "%s | Marcelo Luz Transportes",
   },
   description:
-    "Transporte rodovi?rio e mudan?as para PF e PJ. Sede em Macei? (AL), atua??o intermunicipal e interestadual desde 2022. Or?amento pelo site.",
+    "Transporte rodoviário e mudanças para PF e PJ. Sede em Maceió (AL), atuação intermunicipal e interestadual desde 2022. Orçamento pelo site.",
   keywords: [
-    "mudan?as Macei?",
+    "mudanças Maceió",
     "transporte Nordeste",
-    "mudan?a interestadual",
+    "mudança interestadual",
     "Marcelo Luz Transportes",
-    "frete mudan?a AL",
+    "frete mudança AL",
   ],
   authors: [{ name: "Marcelo Luz Transportes" }],
   openGraph: {
@@ -38,16 +38,16 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: siteUrl,
     siteName: "Marcelo Luz Transportes",
-    title: "Marcelo Luz Transportes | Mudan?as em todo o Nordeste",
+    title: "Marcelo Luz Transportes | Mudanças em todo o Nordeste",
     description:
-      "Mudan?as sem dor de cabe?a no Nordeste e em todo o Brasil. WhatsApp oficial e formul?rio de or?amento.",
+      "Mudanças sem dor de cabeça no Nordeste e em todo o Brasil. WhatsApp oficial e formulário de orçamento.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Marcelo Luz Transportes" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Marcelo Luz Transportes",
     description:
-      "Mudan?as e transportes com seguran?a. Base em Macei?, Nordeste inteiro.",
+      "Mudanças e transportes com segurança. Base em Maceió, Nordeste inteiro.",
     images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
@@ -62,7 +62,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} min-h-screen bg-slate-50 font-sans text-[#152B4D] antialiased transition-colors duration-500 selection:bg-slate-300 selection:text-[#152B4D] dark:bg-[#152B4D] dark:text-white dark:selection:bg-white/20 dark:selection:text-white`}
+        className={`${inter.variable} ${jetbrainsMono.variable} min-h-screen bg-[#c5d9ed] font-sans text-[#1a2b4b] antialiased transition-colors duration-500 selection:bg-[#94a3b8]/50 selection:text-[#0f172a] dark:bg-[#0f172a] dark:text-[#f8fafc] dark:selection:bg-sky-500/30 dark:selection:text-white`}
       >
         <ThemeProvider>{children}</ThemeProvider>
       </body>

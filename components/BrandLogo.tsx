@@ -37,7 +37,7 @@ export function BrandLogo({
         />
       </div>
       <span
-        className={`max-w-[16rem] text-[9px] font-extrabold uppercase leading-tight tracking-[0.14em] text-[#152B4D] transition-colors duration-500 dark:text-white sm:text-[10px] md:text-[11px] ${textAlign}`}
+        className={`max-w-[16rem] text-[9px] font-extrabold uppercase leading-tight tracking-[0.14em] text-[#1a2b4b] transition-colors duration-500 dark:text-[#f8fafc] sm:text-[10px] md:text-[11px] ${textAlign}`}
       >
         MARCELO LUZ TRANSPORTES
       </span>
