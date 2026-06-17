@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   Boxes,
   Building2,
-  Car,
   Home,
   Package,
   ShieldPlus,
@@ -40,12 +39,6 @@ const ITEMS: {
     title: "Transporte de Cargas e Encomendas",
     body: "Cargas gerais com foco em segurança e fluxo de entregas e recebimentos.",
     iconClass: "text-cyan-600",
-  },
-  {
-    icon: Car,
-    title: "Transporte de Veículos",
-    body: "Opções seguras e confiáveis para transportar carros, motos ou frotas para qualquer lugar do Brasil.",
-    iconClass: "text-orange-600",
   },
   {
     icon: ShieldPlus,
