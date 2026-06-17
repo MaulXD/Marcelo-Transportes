@@ -14,7 +14,9 @@ const nextConfig: NextConfig = {
     return [
       // Google às vezes cria /início a partir do rótulo "Início" no menu
       { source: "/início", destination: "/", permanent: true },
+      { source: "/in%C3%ADcio", destination: "/", permanent: true },
       { source: "/inicio", destination: "/", permanent: true },
+      { source: "/Inicio", destination: "/", permanent: true },
       ...SECTIONS.map((section) => ({
         source: `/${section}`,
         destination: `/#${section}`,
