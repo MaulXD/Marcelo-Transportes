@@ -5,7 +5,7 @@ type BrandLogoProps = {
 };
 
 /**
- * Logo oficial: ícone (PNG tema claro/escuro) + texto MARCELO LUZ TRANSPORTES empilhados.
+ * Logo oficial: ícone (WebP tema claro/escuro) + texto MARCELO LUZ TRANSPORTES empilhados.
  */
 export function BrandLogo({
   align = "center",
@@ -21,14 +21,14 @@ export function BrandLogo({
     <div className={`flex flex-col ${itemsAlign} gap-0.5 ${className}`}>
       <div className={`relative ${logoBox}`}>
         <img
-          src="/MT-LOGO-ESCURA.png"
+          src="/MT-LOGO-ESCURA.webp"
           alt="Marcelo Luz Transportes"
           className="absolute inset-0 h-full w-full object-contain opacity-100 transition-opacity duration-500 dark:opacity-0"
           width={132}
           height={72}
         />
         <img
-          src="/MT-LOGO-BRANCA.png"
+          src="/MT-LOGO-BRANCA.webp"
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-contain opacity-0 transition-opacity duration-500 dark:opacity-100"

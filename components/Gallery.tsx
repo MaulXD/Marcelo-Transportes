@@ -6,11 +6,11 @@ import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 
 const PHOTOS = [
-  "/galeria/foto1.jpg",
-  "/galeria/foto2.jpg",
-  "/galeria/foto3.jpg",
-  "/galeria/foto4.jpg",
-  "/galeria/foto5.jpg",
+  "/galeria/foto1.webp",
+  "/galeria/foto2.webp",
+  "/galeria/foto3.webp",
+  "/galeria/foto4.webp",
+  "/galeria/foto5.webp",
 ];
 
 /** Loop duplicado para rolagem contínua sem salto visual. */
