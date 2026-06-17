@@ -59,3 +59,7 @@ export function absoluteUrl(path = ""): string {
   if (!path) return base;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+export function siteHostname(): string {
+  return new URL(siteConfig.url).host;
+}
