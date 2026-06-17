@@ -3,7 +3,7 @@ export const siteConfig = {
   name: "Marcelo Luz Transportes",
   legalName: "Marcelo Luz Transportes",
   url:
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://marceloluztransportes.com.br",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://marcelotransportes.com.br",
   locale: "pt_BR",
   language: "pt-BR",
   foundingYear: 2022,
@@ -11,7 +11,7 @@ export const siteConfig = {
   phoneDisplay: "(82) 99949-0684",
   phoneE164: "+5582999490684",
   whatsappDigits: "5582999490684",
-  email: "contato@marceloluztransportes.com.br",
+  email: "contato@marcelotransportes.com.br",
   address: {
     locality: "Maceió",
     region: "AL",

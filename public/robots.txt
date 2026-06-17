@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marceloluztransportes.com.br/sitemap.xml
+Sitemap: https://marcelotransportes.com.br/sitemap.xml
