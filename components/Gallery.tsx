@@ -6,12 +6,27 @@ import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 
 const PHOTOS = [
-  "/galeria/foto1.webp",
-  "/galeria/foto2.webp",
-  "/galeria/foto3.webp",
-  "/galeria/foto4.webp",
-  "/galeria/foto5.webp",
-];
+  {
+    src: "/galeria/foto1.webp",
+    alt: "Equipe Marcelo Luz Transportes realizando mudança em Maceió",
+  },
+  {
+    src: "/galeria/foto2.webp",
+    alt: "Caminhão de mudanças da Marcelo Luz Transportes no Nordeste",
+  },
+  {
+    src: "/galeria/foto3.webp",
+    alt: "Transporte de móveis e cargas com segurança em Alagoas",
+  },
+  {
+    src: "/galeria/foto4.webp",
+    alt: "Frota de transporte para fretes intermunicipais e interestaduais",
+  },
+  {
+    src: "/galeria/foto5.webp",
+    alt: "Serviço de mudança residencial e comercial Marcelo Luz Transportes",
+  },
+] as const;
 
 /** Loop duplicado para rolagem contínua sem salto visual. */
 const LOOP = [...PHOTOS, ...PHOTOS];
@@ -188,15 +203,15 @@ export function Gallery() {
           onTouchStart={() => pauseAuto(10000)}
           onWheel={() => pauseAuto(6000)}
         >
-          {LOOP.map((src, i) => (
+          {LOOP.map((photo, i) => (
             <div
-              key={`${src}-${i}`}
+              key={`${photo.src}-${i}`}
               data-slide
               className="relative aspect-square w-[min(72vw,260px)] shrink-0 snap-center overflow-hidden rounded-xl border border-white/15 shadow-lg sm:w-72 md:w-80"
             >
               <Image
-                src={src}
-                alt=""
+                src={photo.src}
+                alt={photo.alt}
                 fill
                 sizes="(max-width: 768px) 72vw, 320px"
                 className="object-cover transition-transform duration-500 hover:scale-105"

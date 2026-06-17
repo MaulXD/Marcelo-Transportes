@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { JsonLd } from "@/components/JsonLd";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { absoluteUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -13,45 +15,72 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://marceloluztransportes.com.br";
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default:
-      "Marcelo Luz Transportes | Mudanças de Maceió para todo o Nordeste",
-    template: "%s | Marcelo Luz Transportes",
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Transporte rodoviário e mudanças para PF e PJ. Sede em Maceió (AL), atuação intermunicipal e interestadual desde 2022. Orçamento pelo site.",
-  keywords: [
-    "mudanças Maceió",
-    "transporte Nordeste",
-    "mudança interestadual",
-    "Marcelo Luz Transportes",
-    "frete mudança AL",
-  ],
-  authors: [{ name: "Marcelo Luz Transportes" }],
+  description: siteConfig.description,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "transporte e mudan?as",
+  applicationName: siteConfig.name,
+  formatDetection: {
+    telephone: true,
+    email: false,
+    address: false,
+  },
   openGraph: {
     type: "website",
-    locale: "pt_BR",
-    url: siteUrl,
-    siteName: "Marcelo Luz Transportes",
-    title: "Marcelo Luz Transportes | Mudanças em todo o Nordeste",
-    description:
-      "Mudanças sem dor de cabeça no Nordeste e em todo o Brasil. WhatsApp oficial e formulário de orçamento.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Marcelo Luz Transportes" }],
+    locale: siteConfig.locale,
+    url: absoluteUrl("/"),
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.ogImageAlt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Marcelo Luz Transportes",
-    description:
-      "Mudanças e transportes com segurança. Base em Maceió, Nordeste inteiro.",
+    title: siteConfig.title,
+    description: siteConfig.description,
     images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
-  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  alternates: {
+    canonical: absoluteUrl("/"),
+    languages: {
+      "pt-BR": absoluteUrl("/"),
+    },
+  },
+  icons: {
+    icon: "/MT-LOGO-ESCURA.webp",
+    apple: "/MT-LOGO-ESCURA.webp",
+  },
+  ...(googleVerification
+    ? { verification: { google: googleVerification } }
+    : {}),
 };
 
 export default function RootLayout({
@@ -60,10 +89,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang={siteConfig.language} suppressHydrationWarning>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} min-h-screen bg-[#c5d9ed] font-sans text-[#1a2b4b] antialiased transition-colors duration-500 selection:bg-[#94a3b8]/50 selection:text-[#0f172a] dark:bg-[#0f172a] dark:text-[#f8fafc] dark:selection:bg-sky-500/30 dark:selection:text-white`}
       >
+        <JsonLd />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
