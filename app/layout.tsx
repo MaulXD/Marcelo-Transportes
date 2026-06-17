@@ -74,10 +74,6 @@ export const metadata: Metadata = {
       "pt-BR": absoluteUrl("/"),
     },
   },
-  icons: {
-    icon: "/MT-LOGO-ESCURA.webp",
-    apple: "/MT-LOGO-ESCURA.webp",
-  },
   ...(googleVerification
     ? { verification: { google: googleVerification } }
     : {}),
